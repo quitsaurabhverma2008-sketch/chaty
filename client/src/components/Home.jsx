@@ -16,18 +16,18 @@ function Home({ onJoinRoom }) {
   const [currentBg, setCurrentBg] = useState(0);
 
   const animePics = [
-    { theme: 'Demon Slayer', color: '#e63946' },
-    { theme: 'Naruto', color: '#ff6b35' },
-    { theme: 'Solo Leveling', color: '#5c7cfa' },
-    { theme: 'Attack on Titan', color: '#343a40' },
-    { theme: 'Jujutsu Kaisen', color: '#845ef7' },
-    { theme: 'One Piece', color: '#ff922b' },
-    { theme: 'Dragon Ball', color: '#ffd43b' },
-    { theme: 'My Hero Academia', color: '#e85d04' },
-    { theme: 'Death Note', color: '#000000' },
-    { theme: 'Bleach', color: '#f06595' },
-    { theme: 'One Punch Man', color: '#ffe066' },
-    { theme: 'Hunter x Hunter', color: '#20c997' },
+    { name: 'Demon Slayer', img: 'https://images8.alphacoders.com/134/1341913.jpeg' },
+    { name: 'Naruto', img: 'https://images7.alphacoders.com/135/1358978.png' },
+    { name: 'Solo Leveling', img: 'https://images.alphacoders.com/133/1338522.jpeg' },
+    { name: 'Attack on Titan', img: 'https://images.alphacoders.com/132/1329546.jpeg' },
+    { name: 'Jujutsu Kaisen', img: 'https://images.alphacoders.com/134/1342231.png' },
+    { name: 'One Piece', img: 'https://images6.alphacoders.com/133/1338455.png' },
+    { name: 'Dragon Ball', img: 'https://images.alphacoders.com/132/1328163.png' },
+    { name: 'My Hero Academia', img: 'https://images.alphacoders.com/135/1359000.png' },
+    { name: 'Death Note', img: 'https://images7.alphacoders.com/135/1359858.png' },
+    { name: 'Bleach', img: 'https://images.alphacoders.com/132/1328166.png' },
+    { name: 'One Punch Man', img: 'https://images.alphacoders.com/135/1359879.png' },
+    { name: 'Hunter x Hunter', img: 'https://images6.alphacoders.com/135/1359877.png' },
   ];
 
   useEffect(() => {
@@ -36,13 +36,6 @@ function Home({ onJoinRoom }) {
     }, 4000);
     return () => clearInterval(interval);
   }, [animePics.length]);
-
-  useEffect(() => {
-    const bg = document.querySelector('.bg-pic');
-    if (bg) {
-      bg.style.background = animePics[currentBg].color;
-    }
-  }, [currentBg, animePics]);
 
   const handleCreate = async () => {
     setError('');
@@ -153,8 +146,7 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-pic" style={{background: animePics[currentBg].color}}>
-        <div className="bg-text">{animePics[currentBg].theme}</div>
+      <div className="bg-pic" style={{backgroundImage: `url(${animePics[currentBg].img})`}}>
       </div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
