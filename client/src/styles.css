@@ -194,10 +194,10 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 48px;
+  border-radius: 20px;
+  padding: 28px;
   width: 100%;
-  max-width: 420px;
+  max-width: 320px;
   box-shadow: var(--shadow);
   animation: slideUp 0.6s ease-out;
 }
@@ -392,7 +392,7 @@ button:disabled {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 700px;
+  max-width: 400px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -408,7 +408,7 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 12px 16px;
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
@@ -475,12 +475,12 @@ button:disabled {
 
 .messages-area {
   flex: 1;
-  padding: 24px;
+  padding: 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  min-height: 400px;
+  gap: 12px;
+  min-height: 300px;
 }
 
 .no-messages {
@@ -594,8 +594,8 @@ button:disabled {
 
 .message-form {
   display: flex;
-  gap: 14px;
-  padding: 20px 24px;
+  gap: 10px;
+  padding: 12px 16px;
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--border);
@@ -603,11 +603,11 @@ button:disabled {
 
 .message-form input {
   flex: 1;
-  padding: 14px 18px;
+  padding: 10px 14px;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 15px;
+  border-radius: 10px;
+  font-size: 14px;
   color: var(--text);
   transition: all 0.3s ease;
 }
@@ -626,7 +626,7 @@ button:disabled {
 
 .message-form button {
   width: auto;
-  padding: 14px 28px;
+  padding: 10px 20px;
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
