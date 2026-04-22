@@ -15,30 +15,27 @@ function Home({ onJoinRoom }) {
   const [showOptions, setShowOptions] = useState(false);
   const [currentBg, setCurrentBg] = useState(0);
 
-  const backgrounds = [
-    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-    'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
-    'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)',
-    'linear-gradient(135deg, #c471f5 0%, #fa71cd 100%)',
-    'linear-gradient(135deg, #30cfd0 0%, #a3eeff 100%)',
-    'linear-gradient(135deg, #a6c0fc 0%, #d4a5ff 100%)',
-    'linear-gradient(135deg, #f78ca0 0%, #fbd8b7 100%)',
-    'linear-gradient(135deg, #fddb92 0%, #d1fd7a 100%)',
+  const animePics = [
+    'https://i.pinimg.com/736x/a6/73/52/a673528f46f566c8b5c8c70920f95f79.jpg',
+    'https://i.pinimg.com/736x/a1/88/c3/a188c36f91c9bb2e8e9a6b81e457f6d2.jpg',
+    'https://i.pinimg.com/736x/1f/54/3c/1f543c0e80e62ee15c3c89e5a7e9cd1e.jpg',
+    'https://i.pinimg.com/736x/1b/4e/92/1b4e92c8d18a1dd8f7c6c6c64a8b4c9d.jpg',
+    'https://i.pinimg.com/736x/5c/e9/95/5ce9953b5c3f8e0a87e20e7a0df56c3d.jpg',
+    'https://i.pinimg.com/736x/9c/38/a4/9c38a4e0bc7c6e0a9a1e8c1e0c8c6d9e.jpg',
+    'https://i.pinimg.com/736x/2c/fc/92/2cfc92f40f0f4fcf9b8e6a3d8e3c0e5d.jpg',
+    'https://i.pinimg.com/736x/3d/7c/5e/3d7c5e1eb3f51d2a2f8e1d1f5e4c8d9e.jpg',
+    'https://i.pinimg.com/736x/4e/8c/b9/4e8cb9d9a5b7b1e0e3c4f1d7c7c5e8d.jpg',
+    'https://i.pinimg.com/736x/5f/9d/2e/5f9d2ed9b8e8f1e0f0f1f5e5b7c1e9.jpg',
+    'https://i.pinimg.com/736x/6e/8c/5f/6e8c5f6f9f9b1e1e4c5f2d8c8d6e9f.jpg',
+    'https://i.pinimg.com/736x/7f/9d/6e/7f9d6e8a9a9f1e1f5d6f3e9d9e7f0e.jpg',
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBg(prev => (prev + 1) % backgrounds.length);
+      setCurrentBg(prev => (prev + 1) % animePics.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [backgrounds.length]);
+  }, [animePics.length]);
 
   const handleCreate = async () => {
     setError('');
@@ -149,7 +146,7 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-gradient" style={{background: backgrounds[currentBg]}}></div>
+      <div className="bg-pic" style={{backgroundImage: `url(${animePics[currentBg]})`}}></div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>
