@@ -123,6 +123,30 @@ app.post('/api/rooms/:roomId/join', (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/api/rooms/:roomId/leave', (req, res) => {
+  const { roomId } = req.params;
+  const { username } = req.body;
+  
+  if (!rooms.has(roomId)) {
+    return res.status(404).json({ error: 'Room not found' });
+  }
+  
+  const leaveMessage = {
+    id: Date.now().toString(),
+    type: 'system-left',
+    user: username || 'Anonymous',
+    text: `${username || 'Anonymous'} left the room`,
+    time: formatTime(new Date()),
+    timestamp: Date.now()
+  };
+  
+  const roomMessages = messages.get(roomId) || [];
+  roomMessages.push(leaveMessage);
+  messages.set(roomId, roomMessages);
+  
+  res.json({ success: true });
+});
+
 app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Chat API running' });
 });

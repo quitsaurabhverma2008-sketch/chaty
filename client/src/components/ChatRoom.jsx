@@ -42,11 +42,25 @@ function ChatRoom({ roomId, username, onLeave }) {
     fetchMessages().then(() => setLoading(false));
     
     pollIntervalRef.current = setInterval(fetchMessages, 2000);
+
+    const handleBeforeUnload = async () => {
+      try {
+        await axios.post(`${API_URL}/api/rooms/${roomId}/leave`, {
+          username
+        });
+      } catch (err) {
+        console.error('Failed to notify leave:', err);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
     
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      handleBeforeUnload();
     };
   }, [roomId]);
 
@@ -126,8 +140,9 @@ function ChatRoom({ roomId, username, onLeave }) {
           className="btn-leave"
           data-testid="leave-btn"
           onClick={handleLeave}
+          title="Close chat"
         >
-          Leave
+          ✕
         </button>
       </div>
 
