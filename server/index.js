@@ -1,6 +1,7 @@
 /**
  * Chat Server - Express + Socket.io backend
  * Handles room creation, joining, messaging, and lifecycle management
+ * Configured for Vercel serverless deployment
  */
 
 import express from 'express';
@@ -10,28 +11,21 @@ import cors from 'cors';
 
 const app = express();
 const server = createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
-  }
+  },
+  transports: ['websocket', 'polling'],
+  allowUpgrades: true
 });
 
 app.use(cors());
 app.use(express.json());
 
-/**
- * In-memory room storage
- * Structure: Map<roomId, { id: string, participants: Set<{id, socketId, name}> }>
- * Note: Can be swapped for Redis/PostgreSQL in production
- */
 const rooms = new Map();
 
-/**
- * Generate a unique 4-digit room ID
- * Range: 1000-9999 (excludes leading zeros for UX)
- * Collision handling: Simple retry - in production, use a counter or UUID
- */
 function generateRoomId() {
   const usedIds = new Set(rooms.keys());
   let attempts = 0;
@@ -45,9 +39,6 @@ function generateRoomId() {
   return roomId;
 }
 
-/**
- * Format timestamp for messages
- */
 function formatTime(date) {
   return date.toLocaleTimeString('en-US', { 
     hour: '2-digit', 
@@ -56,18 +47,12 @@ function formatTime(date) {
   });
 }
 
-/**
- * REST: Check if room exists
- */
 app.get('/api/rooms/:roomId', (req, res) => {
   const { roomId } = req.params;
   const exists = rooms.has(roomId);
   res.json({ exists, roomId });
 });
 
-/**
- * REST: Create a new room (returns new roomId)
- */
 app.post('/api/rooms', (req, res) => {
   const roomId = generateRoomId();
   rooms.set(roomId, {
@@ -78,13 +63,13 @@ app.post('/api/rooms', (req, res) => {
   res.json({ roomId });
 });
 
-// Socket.io connection handling
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Chat Server running' });
+});
+
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
-  /**
-   * User joins a room
-   */
   socket.on('join-room', ({ roomId, username }) => {
     const room = rooms.get(roomId);
     
@@ -98,25 +83,19 @@ io.on('connection', (socket) => {
       name: username || 'Anonymous'
     };
 
-    // Add user to room
     room.participants.set(socket.id, user);
     socket.join(roomId);
     socket.data.roomId = roomId;
     socket.data.user = user;
 
-    // Notify room members
     io.to(roomId).emit('user-joined', {
       user: user.name,
       time: formatTime(new Date())
     });
 
-    // Send message history (empty for now - can add Redis later)
     socket.emit('message-history', []);
   });
 
-  /**
-   * User creates and joins a new room
-   */
   socket.on('create-room', ({ username }, callback) => {
     const roomId = generateRoomId();
     rooms.set(roomId, {
@@ -139,9 +118,6 @@ io.on('connection', (socket) => {
     callback({ roomId });
   });
 
-  /**
-   * Handle incoming messages
-   */
   socket.on('chat-message', (message) => {
     const roomId = socket.data.roomId;
     const user = socket.data.user;
@@ -155,9 +131,6 @@ io.on('connection', (socket) => {
     });
   });
 
-  /**
-   * Handle disconnect - cleanup room if empty
-   */
   socket.on('disconnect', () => {
     const roomId = socket.data.roomId;
     const user = socket.data.user;
@@ -168,13 +141,11 @@ io.on('connection', (socket) => {
       if (room) {
         room.participants.delete(socket.id);
 
-        // Notify others in room
         io.to(roomId).emit('user-left', {
           user: user.name,
           time: formatTime(new Date())
         });
 
-        // Remove room if empty
         if (room.participants.size === 0) {
           rooms.delete(roomId);
           console.log(`Room ${roomId} removed (empty)`);
@@ -190,3 +161,5 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+export default app;
