@@ -1,5 +1,5 @@
 /**
- * Home Component - Create or Join a Room (REST version)
+ * Home Component - Create or Join a Room
  */
 
 import { useState, useEffect } from 'react';
@@ -13,22 +13,36 @@ function Home({ onJoinRoom }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-const [currentBg, setCurrentBg] = useState(0);
+  const [currentBg, setCurrentBg] = useState(0);
 
-  const backgrounds = [
-    { background: 'linear-gradient(135deg, #ff416c 0%, #ff4b2c 100%)' },
-    { background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-    { background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-    { background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-    { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+  const animePics = [
+    { theme: 'Demon Slayer', color: '#e63946' },
+    { theme: 'Naruto', color: '#ff6b35' },
+    { theme: 'Solo Leveling', color: '#5c7cfa' },
+    { theme: 'Attack on Titan', color: '#343a40' },
+    { theme: 'Jujutsu Kaisen', color: '#845ef7' },
+    { theme: 'One Piece', color: '#ff922b' },
+    { theme: 'Dragon Ball', color: '#ffd43b' },
+    { theme: 'My Hero Academia', color: '#e85d04' },
+    { theme: 'Death Note', color: '#000000' },
+    { theme: 'Bleach', color: '#f06595' },
+    { theme: 'One Punch Man', color: '#ffe066' },
+    { theme: 'Hunter x Hunter', color: '#20c997' },
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBg(prev => (prev + 1) % backgrounds.length);
-    }, 3000);
+      setCurrentBg(prev => (prev + 1) % animePics.length);
+    }, 4000);
     return () => clearInterval(interval);
-  }, [backgrounds.length]);
+  }, [animePics.length]);
+
+  useEffect(() => {
+    const bg = document.querySelector('.bg-pic');
+    if (bg) {
+      bg.style.background = animePics[currentBg].color;
+    }
+  }, [currentBg, animePics]);
 
   const handleCreate = async () => {
     setError('');
@@ -139,7 +153,9 @@ const [currentBg, setCurrentBg] = useState(0);
 
   return (
     <>
-      <div className="bg-pic" style={backgrounds[currentBg]}></div>
+      <div className="bg-pic" style={{background: animePics[currentBg].color}}>
+        <div className="bg-text">{animePics[currentBg].theme}</div>
+      </div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>

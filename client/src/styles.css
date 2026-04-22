@@ -114,8 +114,19 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;
-  transition: background-image 0.5s ease-in-out;
-  background-color: #1a1a2e;
+  transition: background 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-text {
+  font-size: 120px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.15);
+  text-transform: uppercase;
+  letter-spacing: 20px;
+  user-select: none;
 }
 
 .bg-overlay {
