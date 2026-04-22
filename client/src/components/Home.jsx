@@ -2,7 +2,7 @@
  * Home Component - Create or Join a Room (REST version)
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
@@ -12,7 +12,24 @@ function Home({ onJoinRoom }) {
   const [joinRoomId, setJoinRoomId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState('join');
+  const [showOptions, setShowOptions] = useState(false);
+
+  const photos = [
+    'https://picsum.photos/800/600?random=1',
+    'https://picsum.photos/800/600?random=2',
+    'https://picsum.photos/800/600?random=3',
+    'https://picsum.photos/800/600?random=4',
+    'https://picsum.photos/800/600?random=5',
+    'https://picsum.photos/800/600?random=6',
+  ];
+  const [currentPhoto, setCurrentPhoto] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPhoto(prev => (prev + 1) % photos.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCreate = async () => {
     setError('');
@@ -123,12 +140,12 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-shapes">
-        <div className="bg-shape bg-shape-1"></div>
-        <div className="bg-shape bg-shape-2"></div>
-        <div className="bg-shape bg-shape-3"></div>
-      </div>
-      <div className="home-container">
+      <div className="bg-photo" style={{backgroundImage: `url(${photos[currentPhoto]})`}}></div>
+      <div className="bg-overlay"></div>
+      <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
+        <div className="menu-circle"></div>
+      </button>
+      <div className={`home-container ${showOptions ? 'visible' : ''}`}>
         <div className="home-card">
           <h1 data-testid="app-title">Chat App</h1>
           <p className="subtitle">Create or join a room to start chatting</p>
