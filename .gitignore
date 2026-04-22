@@ -17,3 +17,4 @@ deploy.tar.gz
 deploy.bat
 deploy.ps1
 .cache/
+.vercel
