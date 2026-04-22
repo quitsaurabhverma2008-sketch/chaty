@@ -13,21 +13,14 @@ function Home({ onJoinRoom }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-  const [currentBg, setCurrentBg] = useState(0);
+const [currentBg, setCurrentBg] = useState(0);
 
-  const animePics = [
-    'https://i.pinimg.com/736x/a6/73/52/a673528f46f566c8b5c8c70920f95f79.jpg',
-    'https://i.pinimg.com/736x/a1/88/c3/a188c36f91c9bb2e8e9a6b81e457f6d2.jpg',
-    'https://i.pinimg.com/736x/1f/54/3c/1f543c0e80e62ee15c3c89e5a7e9cd1e.jpg',
-    'https://i.pinimg.com/736x/1b/4e/92/1b4e92c8d18a1dd8f7c6c6c64a8b4c9d.jpg',
-    'https://i.pinimg.com/736x/5c/e9/95/5ce9953b5c3f8e0a87e20e7a0df56c3d.jpg',
-    'https://i.pinimg.com/736x/9c/38/a4/9c38a4e0bc7c6e0a9a1e8c1e0c8c6d9e.jpg',
-    'https://i.pinimg.com/736x/2c/fc/92/2cfc92f40f0f4fcf9b8e6a3d8e3c0e5d.jpg',
-    'https://i.pinimg.com/736x/3d/7c/5e/3d7c5e1eb3f51d2a2f8e1d1f5e4c8d9e.jpg',
-    'https://i.pinimg.com/736x/4e/8c/b9/4e8cb9d9a5b7b1e0e3c4f1d7c7c5e8d.jpg',
-    'https://i.pinimg.com/736x/5f/9d/2e/5f9d2ed9b8e8f1e0f0f1f5e5b7c1e9.jpg',
-    'https://i.pinimg.com/736x/6e/8c/5f/6e8c5f6f9f9b1e1e4c5f2d8c8d6e9f.jpg',
-    'https://i.pinimg.com/736x/7f/9d/6e/7f9d6e8a9a9f1e1f5d6f3e9d9e7f0e.jpg',
+  const backgrounds = [
+    'https://picsum.photos/seed/demonslayer/1920/1080.jpg',
+    'https://picsum.photos/seed/naruto/1920/1080.jpg',
+    'https://picsum.photos/seed/sololeveling/1920/1080.jpg',
+    'https://picsum.photos/seed/attackontitan/1920/1080.jpg',
+    'https://picsum.photos/seed/jujutsukaisen/1920/1080.jpg',
   ];
 
   useEffect(() => {
@@ -146,12 +139,12 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-pic" style={{backgroundImage: `url(${animePics[currentBg]})`}}></div>
+      <div className="bg-pic" style={{backgroundImage: `url(${backgrounds[currentBg]})`}}></div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>
       </button>
-      <div className={`home-container ${showOptions ? 'visible' : ''}`}>
+      <div className="home-container visible">
         <div className="home-card">
           <h1 data-testid="app-title">Chat App</h1>
           <p className="subtitle">Create or join a room to start chatting</p>
