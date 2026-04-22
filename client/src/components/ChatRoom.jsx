@@ -85,6 +85,14 @@ function ChatRoom({ roomId, username, onLeave }) {
   };
 
   const handleLeave = async () => {
+    try {
+      await axios.post(`${API_URL}/api/rooms/${roomId}/leave`, {
+        username
+      });
+    } catch (err) {
+      console.error('Failed to leave:', err);
+    }
+    
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current);
     }
