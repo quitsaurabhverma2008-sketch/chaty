@@ -55,9 +55,18 @@ function Home({ onJoinRoom }) {
       const checkRes = await axios.get(`${API_URL}/api/rooms/${joinRoomId}`);
 
       if (!checkRes.data.exists) {
-        setLoading(false);
-        setError('Room does not exist');
-        return;
+        try {
+          await axios.post(`${API_URL}/api/rooms/${joinRoomId}/recover`, {
+            username: username || 'Anonymous'
+          });
+          setLoading(false);
+          onJoinRoom(joinRoomId, username || 'Anonymous', username || 'Anonymous');
+          return;
+        } catch (recoverErr) {
+          setLoading(false);
+          setError(recoverErr.response?.data?.error || 'Room does not exist');
+          return;
+        }
       }
 
       await axios.post(`${API_URL}/api/rooms/${joinRoomId}/join`, {
@@ -88,6 +97,17 @@ function Home({ onJoinRoom }) {
     setLoading(true);
 
     try {
+      const checkRes = await axios.get(`${API_URL}/api/rooms/${joinRoomId}`);
+      
+      if (checkRes.data.exists) {
+        await axios.post(`${API_URL}/api/rooms/${joinRoomId}/join`, {
+          username: username || 'Anonymous'
+        });
+        setLoading(false);
+        onJoinRoom(joinRoomId, username || 'Anonymous');
+        return;
+      }
+
       await axios.post(`${API_URL}/api/rooms/${joinRoomId}/recover`, {
         username: username || 'Anonymous'
       });
