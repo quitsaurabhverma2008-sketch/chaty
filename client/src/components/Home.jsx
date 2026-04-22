@@ -36,7 +36,7 @@ function Home({ onJoinRoom }) {
     }
   };
 
-  const handleJoinOrRecover = async () => {
+  const handleJoin = async () => {
     setError('');
 
     if (!joinRoomId.trim()) {
@@ -55,18 +55,9 @@ function Home({ onJoinRoom }) {
       const checkRes = await axios.get(`${API_URL}/api/rooms/${joinRoomId}`);
 
       if (!checkRes.data.exists) {
-        try {
-          await axios.post(`${API_URL}/api/rooms/${joinRoomId}/recover`, {
-            username: username || 'Anonymous'
-          });
-          setLoading(false);
-          onJoinRoom(joinRoomId, username || 'Anonymous', username || 'Anonymous');
-          return;
-        } catch (recoverErr) {
-          setLoading(false);
-          setError(recoverErr.response?.data?.error || 'Room does not exist');
-          return;
-        }
+        setLoading(false);
+        setError('Room does not exist');
+        return;
       }
 
       await axios.post(`${API_URL}/api/rooms/${joinRoomId}/join`, {
@@ -78,6 +69,33 @@ function Home({ onJoinRoom }) {
     } catch (err) {
       setLoading(false);
       setError('Failed to join room');
+    }
+  };
+
+  const handleRecover = async () => {
+    setError('');
+
+    if (!joinRoomId.trim()) {
+      setError('Please enter a room ID');
+      return;
+    }
+
+    if (!/^\d{4}$/.test(joinRoomId)) {
+      setError('Room ID must be 4 digits');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await axios.post(`${API_URL}/api/rooms/${joinRoomId}/recover`, {
+        username: username || 'Anonymous'
+      });
+      setLoading(false);
+      onJoinRoom(joinRoomId, username || 'Anonymous', username || 'Anonymous');
+    } catch (err) {
+      setLoading(false);
+      setError(err.response?.data?.error || 'Failed to recover room');
     }
   };
 
@@ -133,14 +151,24 @@ function Home({ onJoinRoom }) {
               />
             </div>
 
-            <button
-              className="btn-join"
-              data-testid="join-room-btn"
-              onClick={handleJoinOrRecover}
-              disabled={loading || !joinRoomId}
-            >
-              {loading ? 'Loading...' : 'Join / Recover'}
-            </button>
+            <div className="join-actions">
+              <button
+                className="btn-join"
+                data-testid="join-room-btn"
+                onClick={handleJoin}
+                disabled={loading || !joinRoomId}
+              >
+                {loading ? 'Joining...' : 'Join'}
+              </button>
+
+              <button
+                className="btn-recover"
+                onClick={handleRecover}
+                disabled={loading || !joinRoomId}
+              >
+                {loading ? 'Recovering...' : 'Recover'}
+              </button>
+            </div>
           </div>
 
           {error && <div className="error-message" data-testid="error-message">{error}</div>}
