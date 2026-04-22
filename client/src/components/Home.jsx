@@ -13,9 +13,9 @@ function Home({ onJoinRoom }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-  const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [currentBg, setCurrentBg] = useState(0);
 
-  const gradients = [
+  const backgrounds = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
     'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
@@ -35,10 +35,10 @@ function Home({ onJoinRoom }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPhoto(prev => (prev + 1) % photos.length);
+      setCurrentBg(prev => (prev + 1) % backgrounds.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [backgrounds.length]);
 
   const handleCreate = async () => {
     setError('');
@@ -149,7 +149,7 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-gradient" style={{background: gradients[currentPhoto]}}></div>
+      <div className="bg-gradient" style={{background: backgrounds[currentBg]}}></div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>
