@@ -191,18 +191,23 @@ app.post('/api/rooms/:roomId/recover', (req, res) => {
   const { roomId } = req.params;
   const { username } = req.body;
   
-  if (!deletedRooms.has(roomId)) {
-    return res.status(404).json({ error: 'No deleted room found with this ID' });
-  }
-  
   const deletedData = deletedRooms.get(roomId);
-  if (deletedData.room.creator !== username) {
-    return res.status(403).json({ error: 'Only original creator can recover this room' });
+  if (deletedData) {
+    if (deletedData.room.creator !== username) {
+      return res.status(403).json({ error: 'Only original creator can recover this room' });
+    }
+    
+    rooms.set(roomId, deletedData.room);
+    messages.set(roomId, deletedData.messages);
+    deletedRooms.delete(roomId);
+  } else if (rooms.has(roomId)) {
+    const room = rooms.get(roomId);
+    if (room.creator !== username) {
+      return res.status(403).json({ error: 'Only creator can re-activate room' });
+    }
+  } else {
+    return res.status(404).json({ error: 'Room not found' });
   }
-  
-  rooms.set(roomId, deletedData.room);
-  messages.set(roomId, deletedData.messages);
-  deletedRooms.delete(roomId);
   
   const recoverMessage = {
     id: Date.now().toString(),
