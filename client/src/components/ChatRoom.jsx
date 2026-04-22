@@ -1,70 +1,80 @@
 /**
- * ChatRoom Component - Real-time messaging interface
+ * ChatRoom Component - Real-time messaging using REST polling
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
+import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://chaty-server-ap26.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://server-lauau0bmj-quitsaurabhverma2008-9330s-projects.vercel.app';
 
 function ChatRoom({ roomId, username, onLeave }) {
-  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
+  const lastFetchRef = useRef(0);
+  const pollIntervalRef = useRef(null);
+
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/rooms/${roomId}/messages?since=${lastFetchRef.current}`);
+      const newMessages = res.data.messages || [];
+      
+      if (newMessages.length > 0) {
+        setMessages(prev => {
+          const existingIds = new Set(prev.map(m => m.id));
+          const uniqueNew = newMessages.filter(m => !existingIds.has(m.id));
+          return [...prev, ...uniqueNew];
+        });
+        
+        const latestMsg = newMessages[newMessages.length - 1];
+        if (latestMsg && latestMsg.timestamp) {
+          lastFetchRef.current = latestMsg.timestamp;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch messages:', err);
+    }
+  };
 
   useEffect(() => {
-    const newSocket = io(API_URL, {
-      transports: ['websocket', 'polling'],
-    });
-
-    newSocket.on('connect', () => {
-      newSocket.emit('join-room', { roomId, username });
-    });
-
-    newSocket.on('chat-message', (msg) => {
-      setMessages((prev) => [...prev, { type: 'message', ...msg, key: Date.now() + Math.random() }]);
-    });
-
-    newSocket.on('user-joined', (data) => {
-      setMessages((prev) => [...prev, { type: 'system-joined', ...data, key: Date.now() + Math.random() }]);
-    });
-
-    newSocket.on('user-left', (data) => {
-      setMessages((prev) => [...prev, { type: 'system-left', ...data, key: Date.now() + Math.random() }]);
-    });
-
-    newSocket.on('error', (data) => {
-      setMessages((prev) => [...prev, { type: 'system-error', text: data.message, key: Date.now() + Math.random() }]);
-    });
-
-    newSocket.on('message-history', (history) => {
-      setMessages(history.map((msg, i) => ({ type: 'message', ...msg, key: i })));
-    });
-
-    setSocket(newSocket);
-
+    lastFetchRef.current = Date.now();
+    fetchMessages().then(() => setLoading(false));
+    
+    pollIntervalRef.current = setInterval(fetchMessages, 2000);
+    
     return () => {
-      newSocket.disconnect();
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
     };
-  }, [roomId, username]);
+  }, [roomId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
+    
+    if (!inputValue.trim()) return;
 
-    if (!inputValue.trim() || !socket) return;
-
-    socket.emit('chat-message', inputValue.trim());
-    setInputValue('');
+    try {
+      await axios.post(`${API_URL}/api/rooms/${roomId}/messages`, {
+        user: username,
+        text: inputValue.trim()
+      });
+      
+      await fetchMessages();
+      setInputValue('');
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
   };
 
-  const handleLeave = () => {
-    if (socket) {
-      socket.disconnect();
+  const handleLeave = async () => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
     }
     onLeave();
   };
@@ -72,7 +82,7 @@ function ChatRoom({ roomId, username, onLeave }) {
   const renderMessage = (msg) => {
     if (msg.type === 'system-joined') {
       return (
-        <div key={msg.key} className="message system" data-testid="system-message">
+        <div key={msg.id} className="message system" data-testid="system-message">
           <span className="system-badge joined">{msg.user}</span> joined the room
           <span className="time">{msg.time}</span>
         </div>
@@ -81,17 +91,9 @@ function ChatRoom({ roomId, username, onLeave }) {
 
     if (msg.type === 'system-left') {
       return (
-        <div key={msg.key} className="message system" data-testid="system-message">
+        <div key={msg.id} className="message system" data-testid="system-message">
           <span className="system-badge left">{msg.user}</span> left the room
           <span className="time">{msg.time}</span>
-        </div>
-      );
-    }
-
-    if (msg.type === 'system-error') {
-      return (
-        <div key={msg.key} className="message error" data-testid="error-message">
-          {msg.text}
         </div>
       );
     }
@@ -100,7 +102,7 @@ function ChatRoom({ roomId, username, onLeave }) {
 
     return (
       <div
-        key={msg.key}
+        key={msg.id}
         className={`message ${isOwn ? 'own' : 'other'}`}
         data-testid="chat-message"
       >
@@ -130,7 +132,9 @@ function ChatRoom({ roomId, username, onLeave }) {
       </div>
 
       <div className="messages-area" data-testid="messages-area">
-        {messages.length === 0 ? (
+        {loading ? (
+          <div className="no-messages">Loading messages...</div>
+        ) : messages.length === 0 ? (
           <div className="no-messages" data-testid="no-messages">
             No messages yet. Start the conversation!
           </div>

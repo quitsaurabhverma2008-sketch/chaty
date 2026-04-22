@@ -1,12 +1,11 @@
 /**
- * Home Component - Create or Join a Room
+ * Home Component - Create or Join a Room (REST version)
  */
 
 import { useState } from 'react';
 import axios from 'axios';
-import { io } from 'socket.io-client';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://chaty-server-ap26.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://server-lauau0bmj-quitsaurabhverma2008-9330s-projects.vercel.app';
 
 function Home({ onJoinRoom }) {
   const [username, setUsername] = useState('');
@@ -19,21 +18,15 @@ function Home({ onJoinRoom }) {
     setLoading(true);
 
     try {
-      const newSocket = io(API_URL, {
-        transports: ['websocket', 'polling'],
+      const res = await axios.post(`${API_URL}/api/rooms`);
+      const roomId = res.data.roomId;
+      
+      await axios.post(`${API_URL}/api/rooms/${roomId}/join`, {
+        username: username || 'Anonymous'
       });
-
-      newSocket.on('connect', () => {
-        newSocket.emit('create-room', { username: username || 'Anonymous' }, (response) => {
-          setLoading(false);
-          onJoinRoom(response.roomId, username || 'Anonymous');
-        });
-      });
-
-      newSocket.on('connect_error', () => {
-        setLoading(false);
-        setError('Failed to connect to server');
-      });
+      
+      setLoading(false);
+      onJoinRoom(roomId, username || 'Anonymous');
     } catch (err) {
       setLoading(false);
       setError('Failed to create room');
@@ -64,23 +57,12 @@ function Home({ onJoinRoom }) {
         return;
       }
 
-      const newSocket = io(API_URL, {
-        transports: ['websocket', 'polling'],
+      await axios.post(`${API_URL}/api/rooms/${joinRoomId}/join`, {
+        username: username || 'Anonymous'
       });
 
-      newSocket.on('connect', () => {
-        newSocket.emit('join-room', {
-          roomId: joinRoomId,
-          username: username || 'Anonymous',
-        });
-        setLoading(false);
-        onJoinRoom(joinRoomId, username || 'Anonymous');
-      });
-
-      newSocket.on('connect_error', () => {
-        setLoading(false);
-        setError('Failed to connect to server');
-      });
+      setLoading(false);
+      onJoinRoom(joinRoomId, username || 'Anonymous');
     } catch (err) {
       setLoading(false);
       setError('Failed to join room');
