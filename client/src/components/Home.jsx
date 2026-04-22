@@ -167,7 +167,7 @@ function Home({ onJoinRoom }) {
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>
       </button>
-      <div className="home-container visible">
+      <div className={`home-container ${showOptions ? 'visible' : ''}`}>
         <div className="home-card">
           <h1 data-testid="app-title">Chat App</h1>
           <p className="subtitle">Create or join a room to start chatting</p>
