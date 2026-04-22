@@ -15,32 +15,22 @@ function Home({ onJoinRoom }) {
   const [showOptions, setShowOptions] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(0);
 
-  const photos = [
-    'https://images6.alphacoders.com/134/1341913.jpeg',
-    'https://images8.alphacoders.com/134/1341920.jpeg',
-    'https://images3.alphacoders.com/134/1341924.jpeg',
-    'https://images4.alphacoders.com/134/1341927.jpeg',
-    'https://images7.alphacoders.com/134/1341930.jpeg',
-    'https://images.alphacoders.com/135/1358978.png',
-    'https://images.alphacoders.com/135/1358981.png',
-    'https://images.alphacoders.com/135/1358984.png',
-    'https://images.alphacoders.com/135/1358987.png',
-    'https://images.alphacoders.com/135/1358990.png',
-    'https://images.alphacoders.com/133/1338522.jpeg',
-    'https://images.alphacoders.com/133/1338523.jpeg',
-    'https://images.alphacoders.com/133/1338525.jpeg',
-    'https://images.alphacoders.com/133/1338529.jpeg',
-    'https://images.alphacoders.com/133/1338530.jpeg',
-    'https://images.alphacoders.com/132/1329546.jpeg',
-    'https://images.alphacoders.com/132/1329550.jpeg',
-    'https://images.alphacoders.com/132/1329553.jpeg',
-    'https://images.alphacoders.com/132/1329556.jpeg',
-    'https://images.alphacoders.com/132/1329559.jpeg',
-    'https://images.alphacoders.com/134/1342231.png',
-    'https://images.alphacoders.com/134/1342236.png',
-    'https://images.alphacoders.com/134/1342240.png',
-    'https://images.alphacoders.com/134/1342243.png',
-    'https://images.alphacoders.com/134/1342248.png',
+  const gradients = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)',
+    'linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%)',
+    'linear-gradient(135deg, #c471f5 0%, #fa71cd 100%)',
+    'linear-gradient(135deg, #30cfd0 0%, #a3eeff 100%)',
+    'linear-gradient(135deg, #a6c0fc 0%, #d4a5ff 100%)',
+    'linear-gradient(135deg, #f78ca0 0%, #fbd8b7 100%)',
+    'linear-gradient(135deg, #fddb92 0%, #d1fd7a 100%)',
   ];
 
   useEffect(() => {
@@ -159,7 +149,7 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-photo" style={{backgroundImage: `url(${photos[currentPhoto]})`}}></div>
+      <div className="bg-gradient" style={{background: gradients[currentPhoto]}}></div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>

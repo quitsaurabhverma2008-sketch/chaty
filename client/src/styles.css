@@ -92,7 +92,7 @@ body {
 }
 
 /* Home Page */
-.bg-photo {
+.bg-gradient {
   position: fixed;
   top: 0;
   left: 0;
@@ -101,7 +101,7 @@ body {
   background-size: cover;
   background-position: center;
   z-index: 0;
-  transition: opacity 0.5s ease;
+  transition: background 0.8s ease;
 }
 
 .bg-overlay {
