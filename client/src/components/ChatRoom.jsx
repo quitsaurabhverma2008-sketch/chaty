@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
+const SERVER_URL = API_URL;
 
 function ChatRoom({ roomId, username, onLeave }) {
   const [messages, setMessages] = useState([]);
@@ -43,24 +44,21 @@ function ChatRoom({ roomId, username, onLeave }) {
     
     pollIntervalRef.current = setInterval(fetchMessages, 2000);
 
-    const handleBeforeUnload = async () => {
-      try {
-        await axios.post(`${API_URL}/api/rooms/${roomId}/leave`, {
-          username
-        });
-      } catch (err) {
-        console.error('Failed to notify leave:', err);
-      }
+    const notifyLeave = () => {
+      const data = JSON.stringify({ username });
+      navigator.sendBeacon(`${API_URL}/api/rooms/${roomId}/leave`, data);
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', notifyLeave);
+    window.addEventListener('beforeunload', notifyLeave);
     
     return () => {
       if (pollIntervalRef.current) {
         clearInterval(pollIntervalRef.current);
       }
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      handleBeforeUnload();
+      window.removeEventListener('pagehide', notifyLeave);
+      window.removeEventListener('beforeunload', notifyLeave);
+      notifyLeave();
     };
   }, [roomId]);
 
