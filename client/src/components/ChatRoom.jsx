@@ -138,6 +138,24 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
       );
     }
 
+    if (msg.type === 'system-deleted') {
+      return (
+        <div key={msg.id} className="message system" data-testid="system-message">
+          <span className="system-badge deleted">Room</span> was deleted
+          <span className="time">{msg.time}</span>
+        </div>
+      );
+    }
+
+    if (msg.type === 'system-recovered') {
+      return (
+        <div key={msg.id} className="message system" data-testid="system-message">
+          <span className="system-badge recovered">Room</span> was recovered
+          <span className="time">{msg.time}</span>
+        </div>
+      );
+    }
+
     const isOwn = msg.user === username;
 
     return (

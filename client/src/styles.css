@@ -468,6 +468,14 @@ button:disabled {
   color: #fbbf24;
 }
 
+.system-badge.deleted {
+  color: var(--danger);
+}
+
+.system-badge.recovered {
+  color: var(--success);
+}
+
 .message.error {
   align-self: center;
   background: rgba(239, 68, 68, 0.15);

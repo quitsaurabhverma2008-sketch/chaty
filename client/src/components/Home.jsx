@@ -12,6 +12,7 @@ function Home({ onJoinRoom }) {
   const [joinRoomId, setJoinRoomId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState('join');
 
   const handleCreate = async () => {
     setError('');
@@ -35,7 +36,7 @@ function Home({ onJoinRoom }) {
     }
   };
 
-  const handleJoin = async () => {
+  const handleJoinOrRecover = async () => {
     setError('');
 
     if (!joinRoomId.trim()) {
@@ -54,9 +55,18 @@ function Home({ onJoinRoom }) {
       const checkRes = await axios.get(`${API_URL}/api/rooms/${joinRoomId}`);
 
       if (!checkRes.data.exists) {
-        setLoading(false);
-        setError('Room does not exist');
-        return;
+        try {
+          await axios.post(`${API_URL}/api/rooms/${joinRoomId}/recover`, {
+            username: username || 'Anonymous'
+          });
+          setLoading(false);
+          onJoinRoom(joinRoomId, username || 'Anonymous', username || 'Anonymous');
+          return;
+        } catch (recoverErr) {
+          setLoading(false);
+          setError(recoverErr.response?.data?.error || 'Room does not exist');
+          return;
+        }
       }
 
       await axios.post(`${API_URL}/api/rooms/${joinRoomId}/join`, {
@@ -126,10 +136,10 @@ function Home({ onJoinRoom }) {
             <button
               className="btn-join"
               data-testid="join-room-btn"
-              onClick={handleJoin}
+              onClick={handleJoinOrRecover}
               disabled={loading || !joinRoomId}
             >
-              {loading ? 'Joining...' : 'Join Room'}
+              {loading ? 'Loading...' : 'Join / Recover'}
             </button>
           </div>
 

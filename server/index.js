@@ -14,6 +14,7 @@ app.use(express.json());
 
 const rooms = new Map();
 const messages = new Map();
+const deletedRooms = new Map();
 
 function generateRoomId() {
   const usedIds = new Set(rooms.keys());
@@ -174,10 +175,48 @@ app.delete('/api/rooms/:roomId', (req, res) => {
   roomMessages.push(deleteMessage);
   messages.set(roomId, roomMessages);
   
+  deletedRooms.set(roomId, {
+    room: rooms.get(roomId),
+    messages: messages.get(roomId)
+  });
+  
   rooms.delete(roomId);
   messages.delete(roomId);
   
   res.json({ success: true });
+});
+
+app.post('/api/rooms/:roomId/recover', (req, res) => {
+  const { roomId } = req.params;
+  const { username } = req.body;
+  
+  if (!deletedRooms.has(roomId)) {
+    return res.status(404).json({ error: 'No deleted room found with this ID' });
+  }
+  
+  const deletedData = deletedRooms.get(roomId);
+  if (deletedData.room.creator !== username) {
+    return res.status(403).json({ error: 'Only original creator can recover this room' });
+  }
+  
+  rooms.set(roomId, deletedData.room);
+  messages.set(roomId, deletedData.messages);
+  deletedRooms.delete(roomId);
+  
+  const recoverMessage = {
+    id: Date.now().toString(),
+    type: 'system-recovered',
+    user: username,
+    text: `Room was recovered by ${username}`,
+    time: formatTime(new Date()),
+    timestamp: Date.now()
+  };
+  
+  const roomMessages = messages.get(roomId) || [];
+  roomMessages.push(recoverMessage);
+  messages.set(roomId, roomMessages);
+  
+  res.json({ success: true, roomId });
 });
 
 app.get('/', (req, res) => {
