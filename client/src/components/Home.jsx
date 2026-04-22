@@ -25,10 +25,10 @@ const [currentBg, setCurrentBg] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentBg(prev => (prev + 1) % animePics.length);
+      setCurrentBg(prev => (prev + 1) % backgrounds.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [animePics.length]);
+  }, [backgrounds.length]);
 
   const handleCreate = async () => {
     setError('');
