@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://server-lauau0bmj-quitsaurabhverma2008-9330s-projects.vercel.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
 
 function Home({ onJoinRoom }) {
   const [username, setUsername] = useState('');
