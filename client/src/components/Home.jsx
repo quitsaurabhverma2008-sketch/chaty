@@ -13,16 +13,35 @@ function Home({ onJoinRoom }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [currentPhoto, setCurrentPhoto] = useState(0);
 
   const photos = [
-    'https://picsum.photos/800/600?random=1',
-    'https://picsum.photos/800/600?random=2',
-    'https://picsum.photos/800/600?random=3',
-    'https://picsum.photos/800/600?random=4',
-    'https://picsum.photos/800/600?random=5',
-    'https://picsum.photos/800/600?random=6',
+    'https://otakuotaku.vercel.app/demonslayer/1',
+    'https://otakuotaku.vercel.app/demonslayer/2',
+    'https://otakuotaku.vercel.app/demonslayer/3',
+    'https://otakuotaku.vercel.app/demonslayer/4',
+    'https://otakuotaku.vercel.app/demonslayer/5',
+    'https://otakuotaku.vercel.app/naruto/1',
+    'https://otakuotaku.vercel.app/naruto/2',
+    'https://otakuotaku.vercel.app/naruto/3',
+    'https://otakuotaku.vercel.app/naruto/4',
+    'https://otakuotaku.vercel.app/naruto/5',
+    'https://otakuotaku.vercel.app/sololeveling/1',
+    'https://otakuotaku.vercel.app/sololeveling/2',
+    'https://otakuotaku.vercel.app/sololeveling/3',
+    'https://otakuotaku.vercel.app/sololeveling/4',
+    'https://otakuotaku.vercel.app/sololeveling/5',
+    'https://otakuotaku.vercel.app/attackontitan/1',
+    'https://otakuotaku.vercel.app/attackontitan/2',
+    'https://otakuotaku.vercel.app/attackontitan/3',
+    'https://otakuotaku.vercel.app/attackontitan/4',
+    'https://otakuotaku.vercel.app/attackontitan/5',
+    'https://otakuotaku.vercel.app/jujutsu/1',
+    'https://otakuotaku.vercel.app/jujutsu/2',
+    'https://otakuotaku.vercel.app/jujutsu/3',
+    'https://otakuotaku.vercel.app/jujutsu/4',
+    'https://otakuotaku.vercel.app/jujutsu/5',
   ];
-  const [currentPhoto, setCurrentPhoto] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
