@@ -44,7 +44,8 @@ app.get('/api/health', (req, res) => {
 app.get('/api/rooms/:roomId', (req, res) => {
   const { roomId } = req.params;
   const exists = rooms.has(roomId);
-  res.json({ exists, roomId });
+  const creator = exists ? rooms.get(roomId).creator : null;
+  res.json({ exists, roomId, creator });
 });
 
 app.post('/api/rooms', (req, res) => {

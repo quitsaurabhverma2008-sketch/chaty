@@ -69,12 +69,14 @@ function Home({ onJoinRoom }) {
         }
       }
 
+      const isCreator = checkRes.data.creator === (username || 'Anonymous');
+      
       await axios.post(`${API_URL}/api/rooms/${joinRoomId}/join`, {
         username: username || 'Anonymous'
       });
 
       setLoading(false);
-      onJoinRoom(joinRoomId, username || 'Anonymous');
+      onJoinRoom(joinRoomId, username || 'Anonymous', isCreator ? username : null);
     } catch (err) {
       setLoading(false);
       setError('Failed to join room');
