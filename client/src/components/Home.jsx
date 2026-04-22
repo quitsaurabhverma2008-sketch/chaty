@@ -18,7 +18,9 @@ function Home({ onJoinRoom }) {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_URL}/api/rooms`);
+      const res = await axios.post(`${API_URL}/api/rooms`, {
+        username: username || 'Anonymous'
+      });
       const roomId = res.data.roomId;
       
       await axios.post(`${API_URL}/api/rooms/${roomId}/join`, {
@@ -26,7 +28,7 @@ function Home({ onJoinRoom }) {
       });
       
       setLoading(false);
-      onJoinRoom(roomId, username || 'Anonymous');
+      onJoinRoom(roomId, username || 'Anonymous', res.data.creator);
     } catch (err) {
       setLoading(false);
       setError('Failed to create room');

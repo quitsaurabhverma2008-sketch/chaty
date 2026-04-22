@@ -47,14 +47,15 @@ app.get('/api/rooms/:roomId', (req, res) => {
 });
 
 app.post('/api/rooms', (req, res) => {
+  const { username } = req.body;
   const roomId = generateRoomId();
   rooms.set(roomId, {
     id: roomId,
-    participants: [],
+    creator: username || 'Anonymous',
     createdAt: new Date()
   });
   messages.set(roomId, []);
-  res.json({ roomId });
+  res.json({ roomId, creator: username || 'Anonymous' });
 });
 
 app.get('/api/rooms/:roomId/messages', (req, res) => {
@@ -143,6 +144,38 @@ app.post('/api/rooms/:roomId/leave', (req, res) => {
   const roomMessages = messages.get(roomId) || [];
   roomMessages.push(leaveMessage);
   messages.set(roomId, roomMessages);
+  
+  res.json({ success: true });
+});
+
+app.delete('/api/rooms/:roomId', (req, res) => {
+  const { roomId } = req.params;
+  const { username } = req.body;
+  
+  if (!rooms.has(roomId)) {
+    return res.status(404).json({ error: 'Room not found' });
+  }
+  
+  const room = rooms.get(roomId);
+  if (room.creator !== username) {
+    return res.status(403).json({ error: 'Only creator can delete room' });
+  }
+  
+  const deleteMessage = {
+    id: Date.now().toString(),
+    type: 'system-deleted',
+    user: username,
+    text: `Room was deleted by ${username}`,
+    time: formatTime(new Date()),
+    timestamp: Date.now()
+  };
+  
+  const roomMessages = messages.get(roomId) || [];
+  roomMessages.push(deleteMessage);
+  messages.set(roomId, roomMessages);
+  
+  rooms.delete(roomId);
+  messages.delete(roomId);
   
   res.json({ success: true });
 });

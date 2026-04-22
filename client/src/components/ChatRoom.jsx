@@ -8,7 +8,8 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
 const SERVER_URL = API_URL;
 
-function ChatRoom({ roomId, username, onLeave }) {
+function ChatRoom({ roomId, username, creator, onLeave }) {
+  const isCreator = username === creator;
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(true);
@@ -99,6 +100,25 @@ function ChatRoom({ roomId, username, onLeave }) {
     onLeave();
   };
 
+  const handleDeleteRoom = async () => {
+    if (!window.confirm('Delete this room permanently?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/api/rooms/${roomId}`, {
+        data: { username }
+      });
+    } catch (err) {
+      console.error('Failed to delete room:', err);
+      alert(err.response?.data?.error || 'Failed to delete room');
+      return;
+    }
+    
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+    }
+    onLeave();
+  };
+
   const renderMessage = (msg) => {
     if (msg.type === 'system-joined') {
       return (
@@ -142,14 +162,25 @@ function ChatRoom({ roomId, username, onLeave }) {
           <span className="room-label">Room</span>
           <span className="room-id" data-testid="room-id">{roomId}</span>
         </div>
-        <button
-          className="btn-leave"
-          data-testid="leave-btn"
-          onClick={handleLeave}
-          title="Close chat"
-        >
-          ✕
-        </button>
+        <div className="header-buttons">
+          {isCreator && (
+            <button
+              className="btn-delete"
+              onClick={handleDeleteRoom}
+              title="Delete room permanently"
+            >
+              🗑️
+            </button>
+          )}
+          <button
+            className="btn-leave"
+            data-testid="leave-btn"
+            onClick={handleLeave}
+            title="Close chat"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div className="messages-area" data-testid="messages-area">

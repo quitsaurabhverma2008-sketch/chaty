@@ -9,15 +9,18 @@ import ChatRoom from './components/ChatRoom';
 function App() {
   const [roomId, setRoomId] = useState(null);
   const [username, setUsername] = useState('Anonymous');
+  const [creator, setCreator] = useState(null);
 
-  const handleJoinRoom = (id, name) => {
+  const handleJoinRoom = (id, name, creatorName) => {
     setRoomId(id);
     setUsername(name);
+    setCreator(creatorName);
   };
 
   const handleLeaveRoom = () => {
     setRoomId(null);
     setUsername('Anonymous');
+    setCreator(null);
   };
 
   if (!roomId) {
@@ -28,6 +31,7 @@ function App() {
     <ChatRoom
       roomId={roomId}
       username={username}
+      creator={creator}
       onLeave={handleLeaveRoom}
     />
   );
