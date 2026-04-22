@@ -16,11 +16,11 @@ function Home({ onJoinRoom }) {
 const [currentBg, setCurrentBg] = useState(0);
 
   const backgrounds = [
-    'https://picsum.photos/seed/demonslayer/1920/1080.jpg',
-    'https://picsum.photos/seed/naruto/1920/1080.jpg',
-    'https://picsum.photos/seed/sololeveling/1920/1080.jpg',
-    'https://picsum.photos/seed/attackontitan/1920/1080.jpg',
-    'https://picsum.photos/seed/jujutsukaisen/1920/1080.jpg',
+    { background: 'linear-gradient(135deg, #ff416c 0%, #ff4b2c 100%)' },
+    { background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+    { background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    { background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+    { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
   ];
 
   useEffect(() => {
@@ -139,7 +139,7 @@ const [currentBg, setCurrentBg] = useState(0);
 
   return (
     <>
-      <div className="bg-pic" style={{backgroundImage: `url(${backgrounds[currentBg]})`}}></div>
+      <div className="bg-pic" style={backgrounds[currentBg]}></div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
         <div className="menu-circle"></div>
