@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://server-9qey1diko-quitsaurabhverma2008-9330s-projects.vercel.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://chaty-server-ap26.onrender.com';
 
 function ChatRoom({ roomId, username, onLeave }) {
   const [socket, setSocket] = useState(null);

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://server-9qey1diko-quitsaurabhverma2008-9330s-projects.vercel.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://chaty-server-ap26.onrender.com';
 
 function Home({ onJoinRoom }) {
   const [username, setUsername] = useState('');
