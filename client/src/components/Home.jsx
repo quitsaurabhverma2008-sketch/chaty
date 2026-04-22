@@ -16,26 +16,41 @@ function Home({ onJoinRoom }) {
   const [currentBg, setCurrentBg] = useState(0);
 
   const animePics = [
-    { name: 'Demon Slayer', img: 'https://images8.alphacoders.com/134/1341913.jpeg' },
-    { name: 'Naruto', img: 'https://images7.alphacoders.com/135/1358978.png' },
-    { name: 'Solo Leveling', img: 'https://images.alphacoders.com/133/1338522.jpeg' },
-    { name: 'Attack on Titan', img: 'https://images.alphacoders.com/132/1329546.jpeg' },
-    { name: 'Jujutsu Kaisen', img: 'https://images.alphacoders.com/134/1342231.png' },
-    { name: 'One Piece', img: 'https://images6.alphacoders.com/133/1338455.png' },
-    { name: 'Dragon Ball', img: 'https://images.alphacoders.com/132/1328163.png' },
-    { name: 'My Hero Academia', img: 'https://images.alphacoders.com/135/1359000.png' },
-    { name: 'Death Note', img: 'https://images7.alphacoders.com/135/1359858.png' },
-    { name: 'Bleach', img: 'https://images.alphacoders.com/132/1328166.png' },
-    { name: 'One Punch Man', img: 'https://images.alphacoders.com/135/1359879.png' },
-    { name: 'Hunter x Hunter', img: 'https://images6.alphacoders.com/135/1359877.png' },
+    { name: 'Demon Slayer', img: 'https://api.waifu.pics/sfw/waifu' },
+    { name: 'Naruto', img: 'https://api.waifu.pics/sfw/neko' },
+    { name: 'Solo Leveling', img: 'https://api.waifu.pics/sfw/shinobu' },
+    { name: 'Attack on Titan', img: 'https://api.waifu.pics/sfw/megumin' },
+    { name: 'Jujutsu Kaisen', img: 'https://api.waifu.pics/sfw/awoo' },
+    { name: 'One Piece', img: 'https://api.waifu.pics/sfw/holo' },
+    { name: 'Dragon Ball', img: 'https://api.waifu.pics/sfw/coppc' },
+    { name: 'My Hero Academia', img: 'https://api.waifu.pics/sfw/kanna' },
+    { name: 'Death Note', img: 'https://api.waifu.pics/sfw/娘' },
+    { name: 'Bleach', img: 'https://api.waifu.pics/sfw/rem' },
+    { name: 'One Punch Man', img: 'https://api.waifu.pics/sfw/pout' },
+    { name: 'Hunter x Hunter', img: 'https://api.waifu.pics/sfw/tsun' },
   ];
+
+  const [bgUrl, setBgUrl] = useState('');
+
+  useEffect(() => {
+    const loadBg = async () => {
+      try {
+        const res = await fetch(animePics[currentBg].img);
+        const data = await res.json();
+        if (data.url) {
+          setBgUrl(data.url);
+        }
+      } catch (e) {}
+    };
+    loadBg();
+  }, [currentBg]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBg(prev => (prev + 1) % animePics.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [animePics.length]);
+  }, []);
 
   const handleCreate = async () => {
     setError('');
@@ -146,7 +161,7 @@ function Home({ onJoinRoom }) {
 
   return (
     <>
-      <div className="bg-pic" style={{backgroundImage: `url(${animePics[currentBg].img})`}}>
+      <div className="bg-pic" style={{backgroundImage: bgUrl ? `url(${bgUrl})` : 'none'}}>
       </div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>
