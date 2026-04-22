@@ -234,6 +234,7 @@ button:disabled {
 }
 
 .btn-join {
+  flex: 1;
   background: linear-gradient(135deg, var(--success), var(--success-dark));
   color: white;
   box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
@@ -251,12 +252,10 @@ button:disabled {
 
 .btn-recover {
   flex: 1;
-  padding: 14px 24px;
   background: linear-gradient(135deg, #8b5cf6, #7c3aed);
   color: white;
   border: 1px solid rgba(139, 92, 246, 0.3);
-  border-radius: 12px;
-  font-size: 15px;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
