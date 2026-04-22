@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://server-lauau0bmj-quitsaurabhverma2008-9330s-projects.vercel.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
 
 function ChatRoom({ roomId, username, onLeave }) {
   const [messages, setMessages] = useState([]);
