@@ -76,23 +76,31 @@ app.get('/api/rooms/:roomId/messages', (req, res) => {
 
 app.post('/api/rooms/:roomId/messages', (req, res) => {
   const { roomId } = req.params;
-  const { user, text } = req.body;
+  const { user, text, file } = req.body;
   
   if (!rooms.has(roomId)) {
     return res.status(404).json({ error: 'Room not found' });
   }
   
-  if (!user || !text) {
-    return res.status(400).json({ error: 'User and text required' });
+  if (!user || (!text && !file)) {
+    return res.status(400).json({ error: 'User and text or file required' });
   }
   
   const message = {
     id: Date.now().toString(),
     user,
-    text,
+    text: text || '',
     time: formatTime(new Date()),
     timestamp: Date.now()
   };
+  
+  if (file) {
+    message.file = {
+      name: file.name,
+      type: file.type,
+      data: file.data
+    };
+  }
   
   const roomMessages = messages.get(roomId) || [];
   roomMessages.push(message);

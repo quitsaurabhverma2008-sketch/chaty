@@ -392,11 +392,13 @@ button:disabled {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 400px;
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   position: relative;
   z-index: 1;
   animation: fadeIn 0.4s ease-out;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -552,7 +554,50 @@ button:disabled {
 
 .message-text {
   word-wrap: break-word;
-  line-height: 1.5;
+}
+
+.file-attachment {
+  margin-top: 8px;
+}
+
+.file-attachment.image img {
+  max-width: 100%;
+  border-radius: 8px;
+  max-height: 200px;
+}
+
+.file-attachment.video video {
+  max-width: 100%;
+  border-radius: 8px;
+  max-height: 200px;
+}
+
+.file-attachment.file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.file-icon {
+  font-size: 20px;
+}
+
+.file-name {
+  flex: 1;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.file-download {
+  font-size: 12px;
+  padding: 4px 8px;
+  background: var(--primary);
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
 }
 
 .message.system {
@@ -641,6 +686,20 @@ button:disabled {
   opacity: 0.5;
 }
 
+.btn-attach {
+  width: auto !important;
+  padding: 10px 14px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  font-size: 18px;
+}
+
+.btn-attach:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: none !important;
+}
+
 /* Scrollbar */
 .messages-area::-webkit-scrollbar {
   width: 6px;
@@ -662,27 +721,46 @@ button:disabled {
 /* Mobile Responsive */
 @media (max-width: 520px) {
   .home-card {
-    padding: 32px 24px;
-    border-radius: 20px;
+    padding: 24px 16px;
+    border-radius: 16px;
+    margin: 10px;
   }
 
   .home-card h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .chat-container {
     max-width: 100%;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
   }
 
   .message {
     max-width: 85%;
+    padding: 8px 12px;
+    font-size: 14px;
   }
 
   .chat-header, .message-form {
-    padding: 16px;
+    padding: 12px;
   }
 
   .room-id {
-    font-size: 1.25rem;
+    font-size: 1rem;
+  }
+  
+  .room-info {
+    gap: 8px;
+  }
+  
+  .room-label {
+    font-size: 12px;
+  }
+  
+  .btn-leave, .btn-delete {
+    padding: 6px 10px;
+    font-size: 14px;
   }
 }

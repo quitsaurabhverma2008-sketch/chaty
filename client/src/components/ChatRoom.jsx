@@ -13,9 +13,11 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef(null);
   const lastFetchRef = useRef(0);
   const pollIntervalRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const fetchMessages = async () => {
     try {
@@ -83,6 +85,43 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
     } catch (err) {
       console.error('Failed to send message:', err);
     }
+  };
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size must be less than 10MB');
+      return;
+    }
+    
+    setUploading(true);
+    
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result;
+        await axios.post(`${API_URL}/api/rooms/${roomId}/messages`, {
+          user: username,
+          text: inputValue.trim(),
+          file: {
+            name: file.name,
+            type: file.type,
+            data: base64
+          }
+        });
+        await fetchMessages();
+        setInputValue('');
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Failed to upload file:', err);
+      setUploading(false);
+    }
+    
+    e.target.value = '';
   };
 
   const handleLeave = async () => {
@@ -158,6 +197,35 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
 
     const isOwn = msg.user === username;
 
+    const renderFile = () => {
+      if (!msg.file) return null;
+      const { name, type, data } = msg.file;
+      
+      if (type.startsWith('image/')) {
+        return (
+          <div className="file-attachment image">
+            <img src={data} alt={name} />
+          </div>
+        );
+      }
+      
+      if (type.startsWith('video/')) {
+        return (
+          <div className="file-attachment video">
+            <video controls src={data} />
+          </div>
+        );
+      }
+      
+      return (
+        <div className="file-attachment file">
+          <span className="file-icon">📄</span>
+          <span className="file-name">{name}</span>
+          <a href={data} download={name} className="file-download">Download</a>
+        </div>
+      );
+    };
+
     return (
       <div
         key={msg.id}
@@ -168,7 +236,8 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
           <span className="sender">{msg.user}</span>
           <span className="time">{msg.time}</span>
         </div>
-        <div className="message-text">{msg.text}</div>
+        {msg.text && <div className="message-text">{msg.text}</div>}
+        {msg.file && renderFile()}
       </div>
     );
   };
@@ -216,6 +285,22 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
 
       <form className="message-form" onSubmit={handleSend}>
         <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          style={{display: 'none'}}
+          accept="image/*,video/*,.pdf,.doc,.docx,.txt,.zip,.apk"
+        />
+        <button 
+          type="button" 
+          className="btn-attach"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          title="Send file"
+        >
+          📎
+        </button>
+        <input
           type="text"
           data-testid="message-input"
           value={inputValue}
@@ -223,7 +308,7 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
           placeholder="Type a message..."
           maxLength={500}
         />
-        <button type="submit" data-testid="send-btn" disabled={!inputValue.trim()}>
+        <button type="submit" data-testid="send-btn" disabled={!inputValue.trim() || uploading}>
           Send
         </button>
       </form>
