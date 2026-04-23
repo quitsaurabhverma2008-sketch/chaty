@@ -108,16 +108,14 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+  background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
   z-index: 0;
   transition: background 0.8s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: #1a1a2e;
 }
 
 .bg-text {
@@ -389,7 +387,8 @@ button:disabled {
 
 /* Chat Room */
 .chat-container {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   max-width: 100%;
@@ -399,6 +398,7 @@ button:disabled {
   z-index: 1;
   animation: fadeIn 0.4s ease-out;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -479,10 +479,10 @@ button:disabled {
   flex: 1;
   padding: 16px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 300px;
 }
 
 .no-messages {
