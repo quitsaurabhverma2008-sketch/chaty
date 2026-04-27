@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
+const API_URL = 'https://server-k1hodgsax-quitsaurabhverma2008-9330s-projects.vercel.app';
 
 function Home({ onJoinRoom }) {
   const [username, setUsername] = useState('');
@@ -16,18 +16,12 @@ function Home({ onJoinRoom }) {
   const [currentBg, setCurrentBg] = useState(0);
 
   const animePics = [
-    { name: 'Demon Slayer', img: 'https://api.waifu.pics/sfw/waifu' },
-    { name: 'Naruto', img: 'https://api.waifu.pics/sfw/neko' },
-    { name: 'Solo Leveling', img: 'https://api.waifu.pics/sfw/shinobu' },
-    { name: 'Attack on Titan', img: 'https://api.waifu.pics/sfw/megumin' },
-    { name: 'Jujutsu Kaisen', img: 'https://api.waifu.pics/sfw/awoo' },
-    { name: 'One Piece', img: 'https://api.waifu.pics/sfw/holo' },
-    { name: 'Dragon Ball', img: 'https://api.waifu.pics/sfw/coppc' },
-    { name: 'My Hero Academia', img: 'https://api.waifu.pics/sfw/kanna' },
-    { name: 'Death Note', img: 'https://api.waifu.pics/sfw/娘' },
-    { name: 'Bleach', img: 'https://api.waifu.pics/sfw/rem' },
-    { name: 'One Punch Man', img: 'https://api.waifu.pics/sfw/pout' },
-    { name: 'Hunter x Hunter', img: 'https://api.waifu.pics/sfw/tsun' },
+    { name: 'Waifu', img: 'https://api.waifu.pics/sfw/waifu' },
+    { name: 'Neko', img: 'https://api.waifu.pics/sfw/neko' },
+    { name: 'Shinobu', img: 'https://api.waifu.pics/sfw/shinobu' },
+    { name: 'Megumin', img: 'https://api.waifu.pics/sfw/megumin' },
+    { name: 'Holo', img: 'https://api.waifu.pics/sfw/holo' },
+    { name: 'Kanna', img: 'https://api.waifu.pics/sfw/kanna' },
   ];
 
   const [bgUrl, setBgUrl] = useState('');
@@ -37,13 +31,21 @@ function Home({ onJoinRoom }) {
       try {
         const res = await fetch(animePics[currentBg].img);
         const data = await res.json();
-        if (data.url) {
-          setBgUrl(data.url);
-        }
+        if (data.url) setBgUrl(data.url);
       } catch (e) {}
     };
     loadBg();
   }, [currentBg]);
+
+  const handlePrev = (e) => {
+    e?.stopPropagation();
+    setCurrentBg(prev => (prev - 1 + animePics.length) % animePics.length);
+  };
+
+  const handleNext = (e) => {
+    e?.stopPropagation();
+    setCurrentBg(prev => (prev + 1) % animePics.length);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -162,6 +164,12 @@ function Home({ onJoinRoom }) {
   return (
     <>
       <div className="bg-pic" style={{backgroundImage: bgUrl ? `url(${bgUrl})` : 'none'}}>
+        <div className="click-zone left" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
+          <span>‹</span>
+        </div>
+        <div className="click-zone right" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
+          <span>›</span>
+        </div>
       </div>
       <div className="bg-overlay"></div>
       <button className="menu-toggle" onClick={() => setShowOptions(!showOptions)}>

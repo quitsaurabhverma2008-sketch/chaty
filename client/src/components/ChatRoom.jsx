@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://server-virid-one-15.vercel.app';
+const API_URL = 'https://server-k1hodgsax-quitsaurabhverma2008-9330s-projects.vercel.app';
 const SERVER_URL = API_URL;
 
 function ChatRoom({ roomId, username, creator, onLeave }) {
@@ -14,6 +14,10 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiPartner, setAiPartner] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiTyping, setAiTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const lastFetchRef = useRef(0);
   const pollIntervalRef = useRef(null);
@@ -73,19 +77,44 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
     e.preventDefault();
     
     if (!inputValue.trim()) return;
-
+    
+    const userMsg = inputValue.trim();
+    const wasAiInChat = aiPartner !== null;
+    
     try {
       await axios.post(`${API_URL}/api/rooms/${roomId}/messages`, {
         user: username,
-        text: inputValue.trim()
+        text: userMsg
       });
+      
+      // If AI partner in room, send message to AI too with 2 second delay
+      if (wasAiInChat) {
+        // Show typing indicator
+        setAiTyping(true);
+        
+        // 2 second delay before AI responds
+        setTimeout(async () => {
+          try {
+            await axios.post(`${API_URL}/api/ai/chat`, {
+              roomId,
+              message: userMsg,
+              userName: username
+            });
+          } catch (aiErr) {
+            console.error('AI chat error:', aiErr);
+          }
+          setAiTyping(false);
+          fetchMessages();
+        }, 2000);
+      }
       
       await fetchMessages();
       setInputValue('');
     } catch (err) {
       console.error('Failed to send message:', err);
+      alert('Failed to send message. Please try again.');
     }
-  };
+};
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
@@ -99,25 +128,56 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
     setUploading(true);
     
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result;
+      const formData = new FormData();
+      formData.append('reqtype', 'fileupload');
+      formData.append('fileToUpload', file);
+      formData.append('userhash', '');
+      
+      const response = await fetch('https://catbox.moe/user/api.php', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const url = await response.text();
+      const trimmedUrl = url.trim();
+      
+      if (trimmedUrl.startsWith('https://files.catbox.moe/')) {
         await axios.post(`${API_URL}/api/rooms/${roomId}/messages`, {
           user: username,
           text: inputValue.trim(),
           file: {
             name: file.name,
             type: file.type,
-            data: base64
+            data: trimmedUrl
           }
         });
         await fetchMessages();
         setInputValue('');
-        setUploading(false);
-      };
-      reader.readAsDataURL(file);
+      } else if (trimmedUrl.startsWith('https://')) {
+        await axios.post(`${API_URL}/api/rooms/${roomId}/messages`, {
+          user: username,
+          text: inputValue.trim(),
+          file: {
+            name: file.name,
+            type: file.type,
+            data: trimmedUrl
+          }
+        });
+        await fetchMessages();
+        setInputValue('');
+      } else {
+        console.log('Catbox response:', trimmedUrl);
+        await axios.post(`${API_URL}/api/rooms/${roomId}/messages`, {
+          user: username,
+          text: inputValue.trim() || 'File shared'
+        });
+        await fetchMessages();
+        setInputValue('');
+      }
     } catch (err) {
-      console.error('Failed to upload file:', err);
+      console.error('Upload error:', err);
+      alert('Upload failed. Try a smaller file.');
+    } finally {
       setUploading(false);
     }
     
@@ -156,6 +216,40 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
       clearInterval(pollIntervalRef.current);
     }
     onLeave();
+  };
+
+  const addAiPartner = async (gender) => {
+    try {
+      const res = await axios.post(`${API_URL}/api/ai/add`, {
+        roomId,
+        gender
+      });
+      setAiPartner(res.data);
+      setShowAiModal(false);
+    } catch (err) {
+      console.error('Failed to add AI:', err);
+      alert(err.response?.data?.error || 'Failed to add AI partner');
+    }
+  };
+
+  const sendAiMessage = async () => {
+    if (!inputValue.trim() || !aiPartner) return;
+    
+    const userMsg = inputValue.trim();
+    setInputValue('');
+    setAiLoading(true);
+    
+    try {
+      const res = await axios.post(`${API_URL}/api/ai/chat`, {
+        roomId,
+        message: userMsg,
+        userName: username
+      });
+    } catch (err) {
+      console.error('AI chat error:', err);
+    }
+    
+    setAiLoading(false);
   };
 
   const renderMessage = (msg) => {
@@ -248,8 +342,19 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
         <div className="room-info">
           <span className="room-label">Room</span>
           <span className="room-id" data-testid="room-id">{roomId}</span>
+          {aiPartner && <span className="ai-badge">🤖 {aiPartner.name}</span>}
         </div>
         <div className="header-buttons">
+          {!aiPartner && (
+            <button
+              type="button"
+              className="btn-ai"
+              onClick={() => setShowAiModal(true)}
+              title="Add AI Partner"
+            >
+              🤖
+            </button>
+          )}
           {isCreator && (
             <button
               className="btn-delete"
@@ -271,6 +376,14 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
       </div>
 
       <div className="messages-area" data-testid="messages-area">
+        {aiTyping && (
+          <div className="typing-indicator">
+            <span>{aiPartner?.name || 'AI'} is typing</span>
+            <span className="typing-dots">
+              <span>.</span><span>.</span><span>.</span>
+            </span>
+          </div>
+        )}
         {loading ? (
           <div className="no-messages">Loading messages...</div>
         ) : messages.length === 0 ? (
@@ -283,35 +396,39 @@ function ChatRoom({ roomId, username, creator, onLeave }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form className="message-form" onSubmit={handleSend}>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileSelect}
-          style={{display: 'none'}}
-          accept="image/*,video/*,.pdf,.doc,.docx,.txt,.zip,.apk"
-        />
-        <button 
-          type="button" 
-          className="btn-attach"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          title="Send file"
-        >
-          📎
-        </button>
-        <input
-          type="text"
-          data-testid="message-input"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Type a message..."
-          maxLength={500}
-        />
-        <button type="submit" data-testid="send-btn" disabled={!inputValue.trim() || uploading}>
-          Send
-        </button>
-      </form>
+<form className="message-form" onSubmit={handleSend}>
+          <input
+            type="text"
+            data-testid="message-input"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={aiPartner ? `Chat with ${aiPartner.name}...` : "Type a message... (paste image links)"}
+            maxLength={500}
+          />
+          <button type="submit" data-testid="send-btn" disabled={!inputValue.trim() || uploading || aiLoading}>
+            {aiLoading ? '...' : 'Send'}
+          </button>
+        </form>
+
+      {showAiModal && (
+        <div className="modal-overlay" onClick={() => setShowAiModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Add AI Partner 🤖</h3>
+            <p>Select a partner personality:</p>
+            <div className="ai-options">
+              <button className="ai-option male" onClick={() => addAiPartner('male')}>
+                👨 Male
+              </button>
+              <button className="ai-option female" onClick={() => addAiPartner('female')}>
+                👩 Female
+              </button>
+            </div>
+            <button className="modal-close" onClick={() => setShowAiModal(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
